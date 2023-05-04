@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  python:
+    image: python:3.9
+    container_name: python
+    volumes:
+      - ./python:/app
+    depends_on:
+      - redis
+    command: python3 /app/main.py
+
+  node:
+    image: node:8
+    container_name: node
+    volumes:
+      - ./node:/app
+    depends_on:
+      - mongo
+    command: node /app/main.js
+
+  php:
+    image: php:7.4-apache
+    container_name: php
+    volumes:
+      - ./php:/var/www/html
+    ports:
+      - 80:80
+    depends_on:
+      - mysql
+    
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+        - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=xpto
+      - MYSQL_DATABASE=xpto
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+  mongo:
+    image: mongo:5.0
+    container_name: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo:/data/db
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis:/data
+  
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
